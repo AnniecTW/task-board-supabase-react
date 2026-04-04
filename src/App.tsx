@@ -4,7 +4,7 @@ import { Board } from "./components/Board";
 function App() {
   const { user, loading } = useAuth();
 
-  if (loading) return <div>loading</div>;
+  if (loading) return <div className="h-screen bg-brand-black" />;
 
   return (
     <div className="app-container">
