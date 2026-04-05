@@ -1,5 +1,5 @@
 import { supabase } from "../lib/supabase";
-import type { Task } from "../types/database";
+import type { Task, TaskInsert, TaskUpdate } from "../types/database";
 
 export async function getAllTasks(): Promise<Task[]> {
   const { data, error } = await supabase
@@ -12,7 +12,7 @@ export async function getAllTasks(): Promise<Task[]> {
   return data || [];
 }
 
-export async function updateTask({
+export async function updateTaskStatus({
   taskId,
   status,
 }: {
@@ -23,5 +23,35 @@ export async function updateTask({
     .from("tasks")
     .update({ status })
     .eq("id", taskId);
+  if (error) throw new Error("Task status could not be updated");
+}
+
+export async function updateTaskFull(
+  taskId: string,
+  updates: TaskUpdate,
+): Promise<Task> {
+  const { data, error } = await supabase
+    .from("tasks")
+    .update(updates)
+    .eq("id", taskId)
+    .select()
+    .single();
   if (error) throw new Error("The task could not be updated");
+  return data;
+}
+
+export async function createTask(newTask: TaskInsert): Promise<Task> {
+  const cleanData = {
+    ...newTask,
+    assignee_id: newTask.assignee_id || null,
+  };
+
+  const { data, error } = await supabase
+    .from("tasks")
+    .insert(cleanData)
+    .select()
+    .single();
+
+  if (error) throw new Error("The task could not be created");
+  return data;
 }

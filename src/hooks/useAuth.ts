@@ -13,7 +13,10 @@ export const useAuth = () => {
       } = await supabase.auth.getSession();
 
       if (!session) {
-        await supabase.auth.signInAnonymously();
+        const {
+          data: { user: newUser },
+        } = await supabase.auth.signInAnonymously();
+        if (newUser) setUser(newUser);
       } else {
         setUser(session.user);
       }

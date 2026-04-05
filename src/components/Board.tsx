@@ -14,6 +14,7 @@ import type { Task } from "../types/database";
 import { useUpdateTaskStatus } from "../hooks/useUpdateTaskStatus";
 import { createPortal } from "react-dom";
 import { TaskCardPure } from "./TaskCardPure";
+import { TaskDetailModal } from "./TaskDetailModal";
 
 interface ColumnData {
   id: Task["status"];
@@ -28,12 +29,31 @@ const COLUMNS_CONF: ColumnData[] = [
   { id: "done", title: "Done", color: "bg-emerald-500" },
 ];
 
+// ─── Modal state ────────────────────────────────────────────────────────────
+
+interface ModalState {
+  isOpen: boolean;
+  task: Task | null;
+  defaultStatus: string;
+  defaultTitle: string;
+}
+
+const CLOSED_MODAL: ModalState = {
+  isOpen: false,
+  task: null,
+  defaultStatus: "todo",
+  defaultTitle: "",
+};
+
+// ─── Board ───────────────────────────────────────────────────────────────────
+
 export const Board = () => {
   const { data: tasks = [], isLoading, error } = useTasks();
   const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
   const { mutate: updateTaskStatus } = useUpdateTaskStatus();
+  const [modal, setModal] = useState<ModalState>(CLOSED_MODAL);
 
-  // sensor
+  // Drag sensors
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: { distance: 5 },
@@ -58,6 +78,17 @@ export const Board = () => {
 
     setActiveTaskId(null);
   };
+
+  // Modal handlers
+  const openEditModal = (task: Task) => {
+    setModal({ isOpen: true, task, defaultStatus: task.status, defaultTitle: "" });
+  };
+
+  const openCreateModal = (status: string, initialTitle = "") => {
+    setModal({ isOpen: true, task: null, defaultStatus: status, defaultTitle: initialTitle });
+  };
+
+  const closeModal = () => setModal(CLOSED_MODAL);
 
   const activeTask = activeTaskId
     ? tasks.find((t) => t.id === activeTaskId)
@@ -90,6 +121,8 @@ export const Board = () => {
               tasks={column.tasks}
               color={column.color}
               status={column.id}
+              onTaskClick={openEditModal}
+              onNewTask={(initialTitle) => openCreateModal(column.id, initialTitle)}
             />
           ))}
         </div>
@@ -104,6 +137,14 @@ export const Board = () => {
           document.body,
         )}
       </DndContext>
+
+      <TaskDetailModal
+        isOpen={modal.isOpen}
+        onClose={closeModal}
+        task={modal.task}
+        defaultStatus={modal.defaultStatus}
+        defaultTitle={modal.defaultTitle}
+      />
     </main>
   );
 };

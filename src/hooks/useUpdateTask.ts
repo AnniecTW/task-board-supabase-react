@@ -1,29 +1,33 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { updateTaskStatus } from "../services/apiTasks";
-import type { Task } from "../types/database";
+import { updateTaskFull } from "../services/apiTasks";
+import type { Task, TaskUpdate } from "../types/database";
 
-export const useUpdateTaskStatus = () => {
+export const useUpdateTask = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: updateTaskStatus,
-    // Optimistic Update
-    onMutate: async (newUpdate) => {
+    mutationFn: ({
+      taskId,
+      updates,
+    }: {
+      taskId: string;
+      updates: TaskUpdate;
+    }) => updateTaskFull(taskId, updates),
+
+    onMutate: async ({ taskId, updates }) => {
       await queryClient.cancelQueries({ queryKey: ["tasks"] });
       const previousTasks = queryClient.getQueryData(["tasks"]);
 
-      // manually update cache
       queryClient.setQueryData<Task[]>(["tasks"], (old) => {
         if (!old) return [];
         return old.map((t) =>
-          t.id === newUpdate.taskId ? { ...t, status: newUpdate.status } : t,
+          t.id === taskId ? { ...t, ...updates } : t,
         );
       });
 
       return { previousTasks };
     },
     onError: (_err, _vars, context) => {
-      // fallback
       queryClient.setQueryData(["tasks"], context?.previousTasks);
     },
     onSettled: () => {
