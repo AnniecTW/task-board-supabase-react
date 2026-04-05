@@ -1,6 +1,7 @@
 import { useDndContext, useDroppable } from "@dnd-kit/core";
 import type { Task } from "../types/database";
 import { TaskCard } from "./TaskCard";
+import { CreateTaskInline } from "./CreateTaskInline";
 
 interface ColumnProps {
   title: string;
@@ -47,6 +48,9 @@ export const Column = ({ title, status, tasks, color }: ColumnProps) => {
           `}
           >
             <div className="h-full w-full rounded-lg border-2 border-dashed border-white/10 bg-white/5" />
+          </div>
+          <div className="mt-2">
+            <CreateTaskInline status={status} />
           </div>
         </div>
       </div>
