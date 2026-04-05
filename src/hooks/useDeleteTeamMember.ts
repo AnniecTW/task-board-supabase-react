@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 import { deleteTeamMember } from "../services/apiTeamMembers";
 import type { TeamMember } from "../types/database";
 
@@ -15,8 +16,9 @@ export const useDeleteTeamMember = () => {
       );
       return { previousMembers };
     },
-    onError: (_err, _vars, context) => {
+    onError: (err, _vars, context) => {
       queryClient.setQueryData(["teamMembers"], context?.previousMembers);
+      toast.error(err instanceof Error ? err.message : "Failed to remove member");
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["teamMembers"] });

@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 import type { Task } from "../types/database";
 import { createTask } from "../services/apiTasks";
 
@@ -22,8 +23,9 @@ export const useCreateTask = () => {
 
       return { previousTasks };
     },
-    onError: (_err, _vars, context) => {
+    onError: (err, _vars, context) => {
       queryClient.setQueryData(["tasks"], context?.previousTasks);
+      toast.error(err instanceof Error ? err.message : "Failed to create task");
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });

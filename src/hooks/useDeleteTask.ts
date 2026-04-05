@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 import { deleteTask } from "../services/apiTasks";
 import type { Task } from "../types/database";
 
@@ -15,8 +16,9 @@ export const useDeleteTask = () => {
       );
       return { previousTasks };
     },
-    onError: (_err, _vars, context) => {
+    onError: (err, _vars, context) => {
       queryClient.setQueryData(["tasks"], context?.previousTasks);
+      toast.error(err instanceof Error ? err.message : "Failed to delete task");
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });

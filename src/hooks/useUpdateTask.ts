@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 import { updateTaskFull } from "../services/apiTasks";
 import type { Task, TaskUpdate } from "../types/database";
 
@@ -27,8 +28,9 @@ export const useUpdateTask = () => {
 
       return { previousTasks };
     },
-    onError: (_err, _vars, context) => {
+    onError: (err, _vars, context) => {
       queryClient.setQueryData(["tasks"], context?.previousTasks);
+      toast.error(err instanceof Error ? err.message : "Failed to save changes");
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
