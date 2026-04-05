@@ -125,14 +125,14 @@ export const Board = ({ searchQuery = "" }: BoardProps) => {
     return <div className="p-10 text-red-500">Error loading tasks.</div>;
 
   return (
-    <main className="flex-1 overflow-x-auto p-6">
+    <main className="flex-1 p-6">
       <DndContext
         sensors={sensors}
         collisionDetection={closestCorners}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
-        <div className="flex h-full gap-6">
+        <div className="flex h-full flex-col gap-6 md:flex-row">
           {columnsWithTasks.map((column) => (
             <Column
               key={column.id}

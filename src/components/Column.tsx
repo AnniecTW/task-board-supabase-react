@@ -30,7 +30,7 @@ export const Column = ({
   const showPlaceholder = isOver && !isTaskFromThisColumn;
 
   return (
-    <div className="flex h-full w-80 flex-col gap-4">
+    <div className="flex w-full flex-col gap-4 md:h-full md:flex-1">
       <div className="flex items-center justify-between px-2">
         <div className="flex items-center gap-2">
           <span className={`h-2 w-2 rounded-full ${color}`} />
