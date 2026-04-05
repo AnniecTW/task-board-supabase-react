@@ -3,10 +3,11 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { X, AlignLeft, Tag, Calendar, Layers, UserCircle2 } from "lucide-react";
+import { X, AlignLeft, Tag, Calendar, Layers, UserCircle2, Trash2 } from "lucide-react";
 import type { Task } from "../types/database";
 import { useUpdateTask } from "../hooks/useUpdateTask";
 import { useCreateTask } from "../hooks/useCreateTask";
+import { useDeleteTask } from "../hooks/useDeleteTask";
 import { useTeamMembers } from "../hooks/useTeamMembers";
 
 // Schema
@@ -76,6 +77,7 @@ export const TaskDetailModal = ({
 }: TaskDetailModalProps) => {
   const { mutate: updateTask, isPending: isUpdating } = useUpdateTask();
   const { mutate: createTask, isPending: isCreating } = useCreateTask();
+  const { mutate: deleteTask } = useDeleteTask();
   const { data: members = [] } = useTeamMembers();
 
   const isNew = !task;
@@ -106,6 +108,12 @@ export const TaskDetailModal = ({
   useEffect(() => {
     if (isOpen) reset(buildDefaults());
   }, [isOpen, task?.id, defaultTitle]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleDelete = () => {
+    if (!task || !window.confirm(`Delete "${task.title}"?`)) return;
+    deleteTask(task.id);
+    onClose();
+  };
 
   const onSubmit = (values: TaskFormValues) => {
     const payload = {
@@ -255,21 +263,33 @@ export const TaskDetailModal = ({
               </div>
 
               {/* Actions */}
-              <div className="flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="rounded-lg px-4 py-2 text-sm text-slate-400 transition-colors hover:bg-white/5 hover:text-slate-200"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isPending}
-                  className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-500 disabled:opacity-50"
-                >
-                  {isNew ? "Create Task" : "Save Changes"}
-                </button>
+              <div className="flex items-center justify-between">
+                {!isNew && (
+                  <button
+                    type="button"
+                    onClick={handleDelete}
+                    className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-slate-500 transition-colors hover:bg-red-500/10 hover:text-red-400"
+                  >
+                    <Trash2 size={14} />
+                    Delete
+                  </button>
+                )}
+                <div className="ml-auto flex gap-2">
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="rounded-lg px-4 py-2 text-sm text-slate-400 transition-colors hover:bg-white/5 hover:text-slate-200"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isPending}
+                    className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-500 disabled:opacity-50"
+                  >
+                    {isNew ? "Create Task" : "Save Changes"}
+                  </button>
+                </div>
               </div>
             </form>
           </div>

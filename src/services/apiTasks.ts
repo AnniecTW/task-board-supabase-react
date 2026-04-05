@@ -40,6 +40,11 @@ export async function updateTaskFull(
   return data;
 }
 
+export async function deleteTask(taskId: string): Promise<void> {
+  const { error } = await supabase.from("tasks").delete().eq("id", taskId);
+  if (error) throw new Error("The task could not be deleted");
+}
+
 export async function createTask(newTask: TaskInsert): Promise<Task> {
   const cleanData = {
     ...newTask,
