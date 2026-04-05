@@ -28,7 +28,7 @@ export const Header = ({ onManageTeam, searchQuery, onSearch }: HeaderProps) => 
     }, [tasks]);
 
   return (
-    <header className="sticky top-0 z-40 flex shrink-0 items-center justify-between border-b border-white/5 bg-[#0d0d0d]/80 px-6 py-3 backdrop-blur-md">
+    <header className="sticky top-0 z-40 flex shrink-0 flex-col gap-3 border-b border-white/5 bg-[#0d0d0d]/80 px-6 py-3 backdrop-blur-md md:flex-row md:items-center md:justify-between md:gap-0">
       {/* ── Left: brand + stats ── */}
       <div className="flex flex-col gap-0.5">
         <div className="flex items-center gap-2">
