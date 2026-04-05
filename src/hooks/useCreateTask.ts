@@ -22,7 +22,7 @@ export const useCreateTask = () => {
 
       return { previousTasks };
     },
-    onError: (err, newTask, context) => {
+    onError: (_err, _vars, context) => {
       queryClient.setQueryData(["tasks"], context?.previousTasks);
     },
     onSettled: () => {

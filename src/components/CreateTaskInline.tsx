@@ -1,18 +1,19 @@
 import { useState, useRef, useEffect } from "react";
-import { Plus, X } from "lucide-react";
+import { Plus, X, Maximize2 } from "lucide-react";
 import { useCreateTask } from "../hooks/useCreateTask";
 
 interface CreateTaskInlineProps {
   status: string;
+  /** Open the full detail modal (optionally with a pre-filled title) */
+  onNewTask: (initialTitle?: string) => void;
 }
 
-export const CreateTaskInline = ({ status }: CreateTaskInlineProps) => {
+export const CreateTaskInline = ({ status, onNewTask }: CreateTaskInlineProps) => {
   const [isAdding, setIsAdding] = useState(false);
   const [title, setTitle] = useState("");
   const { mutate: createTask } = useCreateTask();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // 自動聚焦輸入框
   useEffect(() => {
     if (isAdding) textareaRef.current?.focus();
   }, [isAdding]);
@@ -33,6 +34,13 @@ export const CreateTaskInline = ({ status }: CreateTaskInlineProps) => {
 
     setTitle("");
     setIsAdding(false);
+  };
+
+  const handleOpenModal = () => {
+    const draft = title.trim();
+    setTitle("");
+    setIsAdding(false);
+    onNewTask(draft || undefined);
   };
 
   if (!isAdding) {
@@ -64,19 +72,32 @@ export const CreateTaskInline = ({ status }: CreateTaskInlineProps) => {
         className="w-full resize-none bg-transparent text-sm text-slate-200 outline-none placeholder:text-slate-600"
         rows={3}
       />
-      <div className="mt-2 flex items-center justify-end gap-2">
+      <div className="mt-2 flex items-center justify-between gap-2">
+        {/* Expand to modal */}
         <button
-          onClick={() => setIsAdding(false)}
-          className="rounded p-1 text-slate-500 hover:bg-white/5 hover:text-slate-300"
+          type="button"
+          onClick={handleOpenModal}
+          title="Add more details"
+          className="flex items-center gap-1.5 rounded px-2 py-1 text-[11px] text-slate-500 transition-colors hover:bg-white/5 hover:text-slate-300"
         >
-          <X size={16} />
+          <Maximize2 size={11} />
+          <span>More details</span>
         </button>
-        <button
-          onClick={handleSave}
-          className="rounded bg-indigo-600 px-3 py-1 text-xs font-medium text-white hover:bg-indigo-500"
-        >
-          Add Task
-        </button>
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setIsAdding(false)}
+            className="rounded p-1 text-slate-500 hover:bg-white/5 hover:text-slate-300"
+          >
+            <X size={16} />
+          </button>
+          <button
+            onClick={handleSave}
+            className="rounded bg-indigo-600 px-3 py-1 text-xs font-medium text-white hover:bg-indigo-500"
+          >
+            Add Task
+          </button>
+        </div>
       </div>
     </div>
   );
