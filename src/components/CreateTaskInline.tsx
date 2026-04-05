@@ -4,11 +4,14 @@ import { useCreateTask } from "../hooks/useCreateTask";
 
 interface CreateTaskInlineProps {
   status: string;
-  /** Open the full detail modal (optionally with a pre-filled title) */
+  // Open the full detail modal (optionally with a pre-filled title)
   onNewTask: (initialTitle?: string) => void;
 }
 
-export const CreateTaskInline = ({ status, onNewTask }: CreateTaskInlineProps) => {
+export const CreateTaskInline = ({
+  status,
+  onNewTask,
+}: CreateTaskInlineProps) => {
   const [isAdding, setIsAdding] = useState(false);
   const [title, setTitle] = useState("");
   const { mutate: createTask } = useCreateTask();

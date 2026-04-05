@@ -3,10 +3,12 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { X, AlignLeft, Tag, Calendar, Layers } from "lucide-react";
+import { X, AlignLeft, Tag, Calendar, Layers, UserCircle2, Trash2 } from "lucide-react";
 import type { Task } from "../types/database";
 import { useUpdateTask } from "../hooks/useUpdateTask";
 import { useCreateTask } from "../hooks/useCreateTask";
+import { useDeleteTask } from "../hooks/useDeleteTask";
+import { useTeamMembers } from "../hooks/useTeamMembers";
 
 // Schema
 
@@ -16,6 +18,7 @@ const taskSchema = z.object({
   priority: z.enum(["low", "normal", "high"]),
   due_date: z.string().optional(),
   status: z.enum(["todo", "in_progress", "in_review", "done"]),
+  assignee_id: z.string().nullable().optional(),
 });
 
 type TaskFormValues = z.infer<typeof taskSchema>;
@@ -74,6 +77,8 @@ export const TaskDetailModal = ({
 }: TaskDetailModalProps) => {
   const { mutate: updateTask, isPending: isUpdating } = useUpdateTask();
   const { mutate: createTask, isPending: isCreating } = useCreateTask();
+  const { mutate: deleteTask } = useDeleteTask();
+  const { data: members = [] } = useTeamMembers();
 
   const isNew = !task;
   const isPending = isUpdating || isCreating;
@@ -86,6 +91,7 @@ export const TaskDetailModal = ({
     status:
       (task?.status as TaskFormValues["status"]) ??
       (defaultStatus as TaskFormValues["status"]),
+    assignee_id: task?.assignee_id ?? "",
   });
 
   const {
@@ -103,6 +109,12 @@ export const TaskDetailModal = ({
     if (isOpen) reset(buildDefaults());
   }, [isOpen, task?.id, defaultTitle]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const handleDelete = () => {
+    if (!task || !window.confirm(`Delete "${task.title}"?`)) return;
+    deleteTask(task.id);
+    onClose();
+  };
+
   const onSubmit = (values: TaskFormValues) => {
     const payload = {
       title: values.title,
@@ -110,12 +122,12 @@ export const TaskDetailModal = ({
       priority: values.priority,
       due_date: values.due_date || null,
       status: values.status,
+      assignee_id: values.assignee_id || null,
     };
 
     if (isNew) {
       createTask({
         ...payload,
-        assignee_id: null,
         created_at: new Date().toISOString(),
       });
     } else {
@@ -221,33 +233,63 @@ export const TaskDetailModal = ({
                 </div>
               </div>
 
-              {/* Due Date */}
-              <div className="mb-6 flex flex-col gap-2">
-                <FieldLabel icon={Calendar}>Due Date</FieldLabel>
-                <input
-                  type="date"
-                  {...register("due_date")}
-                  className="rounded-lg border border-white/10 bg-[#252525] px-3 py-2 text-sm text-slate-300 outline-none transition-colors hover:border-white/20"
-                  style={{ colorScheme: "dark" }}
-                />
+              {/* Due Date + Assignee */}
+              <div className="mb-6 grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-2">
+                  <FieldLabel icon={Calendar}>Due Date</FieldLabel>
+                  <input
+                    type="date"
+                    {...register("due_date")}
+                    className="rounded-lg border border-white/10 bg-[#252525] px-3 py-2 text-sm text-slate-300 outline-none transition-colors hover:border-white/20"
+                    style={{ colorScheme: "dark" }}
+                  />
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <FieldLabel icon={UserCircle2}>Assignee</FieldLabel>
+                  <select
+                    {...register("assignee_id")}
+                    className="appearance-none rounded-lg border border-white/10 bg-[#252525] px-3 py-2 text-sm text-slate-300 outline-none transition-colors hover:border-white/20"
+                    style={{ colorScheme: "dark" }}
+                  >
+                    <option value="">Unassigned</option>
+                    {members.map((m) => (
+                      <option key={m.id} value={m.id}>
+                        {m.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
               {/* Actions */}
-              <div className="flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="rounded-lg px-4 py-2 text-sm text-slate-400 transition-colors hover:bg-white/5 hover:text-slate-200"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isPending}
-                  className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-500 disabled:opacity-50"
-                >
-                  {isNew ? "Create Task" : "Save Changes"}
-                </button>
+              <div className="flex items-center justify-between">
+                {!isNew && (
+                  <button
+                    type="button"
+                    onClick={handleDelete}
+                    className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-slate-500 transition-colors hover:bg-red-500/10 hover:text-red-400"
+                  >
+                    <Trash2 size={14} />
+                    Delete
+                  </button>
+                )}
+                <div className="ml-auto flex gap-2">
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="rounded-lg px-4 py-2 text-sm text-slate-400 transition-colors hover:bg-white/5 hover:text-slate-200"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isPending}
+                    className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-500 disabled:opacity-50"
+                  >
+                    {isNew ? "Create Task" : "Save Changes"}
+                  </button>
+                </div>
               </div>
             </form>
           </div>

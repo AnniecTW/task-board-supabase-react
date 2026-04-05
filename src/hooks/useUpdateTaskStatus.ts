@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 import { updateTaskStatus } from "../services/apiTasks";
 import type { Task } from "../types/database";
 
@@ -22,9 +23,9 @@ export const useUpdateTaskStatus = () => {
 
       return { previousTasks };
     },
-    onError: (_err, _vars, context) => {
-      // fallback
+    onError: (err, _vars, context) => {
       queryClient.setQueryData(["tasks"], context?.previousTasks);
+      toast.error(err instanceof Error ? err.message : "Failed to move task");
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });

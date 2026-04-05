@@ -15,6 +15,7 @@ import { useUpdateTaskStatus } from "../hooks/useUpdateTaskStatus";
 import { createPortal } from "react-dom";
 import { TaskCardPure } from "./TaskCardPure";
 import { TaskDetailModal } from "./TaskDetailModal";
+import { BoardSkeleton } from "./BoardSkeleton";
 
 interface ColumnData {
   id: Task["status"];
@@ -29,7 +30,7 @@ const COLUMNS_CONF: ColumnData[] = [
   { id: "done", title: "Done", color: "bg-emerald-500" },
 ];
 
-// ─── Modal state ────────────────────────────────────────────────────────────
+// Modal state
 
 interface ModalState {
   isOpen: boolean;
@@ -45,9 +46,13 @@ const CLOSED_MODAL: ModalState = {
   defaultTitle: "",
 };
 
-// ─── Board ───────────────────────────────────────────────────────────────────
+// Board
 
-export const Board = () => {
+interface BoardProps {
+  searchQuery?: string;
+}
+
+export const Board = ({ searchQuery = "" }: BoardProps) => {
   const { data: tasks = [], isLoading, error } = useTasks();
   const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
   const { mutate: updateTaskStatus } = useUpdateTaskStatus();
@@ -81,11 +86,21 @@ export const Board = () => {
 
   // Modal handlers
   const openEditModal = (task: Task) => {
-    setModal({ isOpen: true, task, defaultStatus: task.status, defaultTitle: "" });
+    setModal({
+      isOpen: true,
+      task,
+      defaultStatus: task.status,
+      defaultTitle: "",
+    });
   };
 
   const openCreateModal = (status: string, initialTitle = "") => {
-    setModal({ isOpen: true, task: null, defaultStatus: status, defaultTitle: initialTitle });
+    setModal({
+      isOpen: true,
+      task: null,
+      defaultStatus: status,
+      defaultTitle: initialTitle,
+    });
   };
 
   const closeModal = () => setModal(CLOSED_MODAL);
@@ -95,13 +110,17 @@ export const Board = () => {
     : null;
 
   const columnsWithTasks = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    const filtered = q
+      ? tasks.filter((t) => t.title.toLowerCase().includes(q))
+      : tasks;
     return COLUMNS_CONF.map((col) => ({
       ...col,
-      tasks: tasks.filter((t) => t.status === col.id),
+      tasks: filtered.filter((t) => t.status === col.id),
     }));
-  }, [tasks]);
+  }, [tasks, searchQuery]);
 
-  if (isLoading) return <div className="p-10 text-white">Loading tasks...</div>;
+  if (isLoading) return <BoardSkeleton />;
   if (error)
     return <div className="p-10 text-red-500">Error loading tasks.</div>;
 
@@ -122,7 +141,9 @@ export const Board = () => {
               color={column.color}
               status={column.id}
               onTaskClick={openEditModal}
-              onNewTask={(initialTitle) => openCreateModal(column.id, initialTitle)}
+              onNewTask={(initialTitle) =>
+                openCreateModal(column.id, initialTitle)
+              }
             />
           ))}
         </div>

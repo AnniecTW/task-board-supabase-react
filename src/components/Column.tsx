@@ -1,4 +1,5 @@
 import { useDndContext, useDroppable } from "@dnd-kit/core";
+import { CircleDashed } from "lucide-react";
 import type { Task } from "../types/database";
 import { TaskCard } from "./TaskCard";
 import { CreateTaskInline } from "./CreateTaskInline";
@@ -47,6 +48,13 @@ export const Column = ({
         }`}
       >
         <div className="flex flex-col gap-3">
+          {tasks.length === 0 && !active && (
+            <div className="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-white/5 bg-white/[0.02] py-8">
+              <CircleDashed size={14} className="text-white/10" />
+              <span className="text-[11px] text-white/20">No tasks yet</span>
+            </div>
+          )}
+
           {tasks.map((task) => (
             <TaskCard key={task.id} task={task} onOpenModal={onTaskClick} />
           ))}
