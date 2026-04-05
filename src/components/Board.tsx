@@ -1,7 +1,19 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import {
+  DndContext,
+  DragOverlay,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  closestCorners,
+} from "@dnd-kit/core";
+import type { DragEndEvent, DragStartEvent } from "@dnd-kit/core";
 import { Column } from "./Column";
 import { useTasks } from "../hooks/useTasks";
 import type { Task } from "../types/database";
+import { useUpdateTaskStatus } from "../hooks/useUpdateTaskStatus";
+import { createPortal } from "react-dom";
+import { TaskCardPure } from "./TaskCardPure";
 
 interface ColumnData {
   id: Task["status"];
@@ -18,6 +30,38 @@ const COLUMNS_CONF: ColumnData[] = [
 
 export const Board = () => {
   const { data: tasks = [], isLoading, error } = useTasks();
+  const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
+  const { mutate: updateTaskStatus } = useUpdateTaskStatus();
+
+  // sensor
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 5 },
+    }),
+  );
+
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveTaskId(event.active.id as string);
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over) return;
+
+    const taskId = active.id as string;
+    const newStatus = over.id as string;
+
+    const task = tasks.find((t) => t.id === taskId);
+    if (task && task.status !== newStatus) {
+      updateTaskStatus({ taskId, status: newStatus as Task["status"] });
+    }
+
+    setActiveTaskId(null);
+  };
+
+  const activeTask = activeTaskId
+    ? tasks.find((t) => t.id === activeTaskId)
+    : null;
 
   const columnsWithTasks = useMemo(() => {
     return COLUMNS_CONF.map((col) => ({
@@ -32,17 +76,34 @@ export const Board = () => {
 
   return (
     <main className="flex-1 overflow-x-auto p-6">
-      <div className="flex h-full gap-6">
-        {columnsWithTasks.map((column) => (
-          <Column
-            key={column.id}
-            title={column.title}
-            tasks={column.tasks}
-            color={column.color}
-            status={column.id}
-          />
-        ))}
-      </div>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCorners}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+      >
+        <div className="flex h-full gap-6">
+          {columnsWithTasks.map((column) => (
+            <Column
+              key={column.id}
+              title={column.title}
+              tasks={column.tasks}
+              color={column.color}
+              status={column.id}
+            />
+          ))}
+        </div>
+        {createPortal(
+          <DragOverlay>
+            {activeTask ? (
+              <div className="scale-105 opacity-80 shadow-2xl">
+                <TaskCardPure task={activeTask} />
+              </div>
+            ) : null}
+          </DragOverlay>,
+          document.body,
+        )}
+      </DndContext>
     </main>
   );
 };

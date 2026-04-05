@@ -11,3 +11,17 @@ export async function getAllTasks(): Promise<Task[]> {
   if (error) throw new Error("Tasks could not be loaded");
   return data || [];
 }
+
+export async function updateTask({
+  taskId,
+  status,
+}: {
+  taskId: string;
+  status: string;
+}) {
+  const { error } = await supabase
+    .from("tasks")
+    .update({ status })
+    .eq("id", taskId);
+  if (error) throw new Error("The task could not be updated");
+}

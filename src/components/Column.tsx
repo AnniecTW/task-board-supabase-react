@@ -1,3 +1,4 @@
+import { useDroppable } from "@dnd-kit/core";
 import type { Task } from "../types/database";
 import { TaskCard } from "./TaskCard";
 
@@ -8,7 +9,8 @@ interface ColumnProps {
   color: string;
 }
 
-export const Column = ({ title, tasks, color }: ColumnProps) => {
+export const Column = ({ title, status, tasks, color }: ColumnProps) => {
+  const { setNodeRef } = useDroppable({ id: status });
   return (
     <div className="flex h-full w-80 flex-col gap-4">
       <div className="flex items-center justify-between px-2">
@@ -21,7 +23,10 @@ export const Column = ({ title, tasks, color }: ColumnProps) => {
         </div>
       </div>
 
-      <div className="flex-1 rounded-xl bg-white/2 p-2 ring-1 ring-white/5 no-scrollbar overflow-y-auto">
+      <div
+        ref={setNodeRef}
+        className="flex-1 rounded-xl bg-white/2 p-2 ring-1 ring-white/5 no-scrollbar overflow-y-auto"
+      >
         <div className="flex flex-col gap-3">
           {tasks.map((task) => (
             <TaskCard key={task.id} task={task} />
