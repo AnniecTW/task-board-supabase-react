@@ -15,6 +15,7 @@ import { useUpdateTaskStatus } from "../hooks/useUpdateTaskStatus";
 import { createPortal } from "react-dom";
 import { TaskCardPure } from "./TaskCardPure";
 import { TaskDetailModal } from "./TaskDetailModal";
+import { BoardSkeleton } from "./BoardSkeleton";
 
 interface ColumnData {
   id: Task["status"];
@@ -101,7 +102,7 @@ export const Board = () => {
     }));
   }, [tasks]);
 
-  if (isLoading) return <div className="p-10 text-white">Loading tasks...</div>;
+  if (isLoading) return <BoardSkeleton />;
   if (error)
     return <div className="p-10 text-red-500">Error loading tasks.</div>;
 
