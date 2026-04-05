@@ -1,4 +1,4 @@
-import { useDroppable } from "@dnd-kit/core";
+import { useDndContext, useDroppable } from "@dnd-kit/core";
 import type { Task } from "../types/database";
 import { TaskCard } from "./TaskCard";
 
@@ -10,7 +10,14 @@ interface ColumnProps {
 }
 
 export const Column = ({ title, status, tasks, color }: ColumnProps) => {
-  const { setNodeRef } = useDroppable({ id: status });
+  const { setNodeRef, isOver } = useDroppable({ id: status });
+
+  const { active } = useDndContext();
+  const isTaskFromThisColumn = active
+    ? tasks.some((t) => t.id === active.id)
+    : false;
+  const showPlaceholder = isOver && !isTaskFromThisColumn;
+
   return (
     <div className="flex h-full w-80 flex-col gap-4">
       <div className="flex items-center justify-between px-2">
@@ -25,12 +32,22 @@ export const Column = ({ title, status, tasks, color }: ColumnProps) => {
 
       <div
         ref={setNodeRef}
-        className="flex-1 rounded-xl bg-white/2 p-2 ring-1 ring-white/5 no-scrollbar overflow-y-auto"
+        className={`flex-1 rounded-xl p-2 ring-1 transition-colors ${
+          isOver ? "bg-white/6 ring-white/20" : "bg-white/2 ring-white/5"
+        }`}
       >
         <div className="flex flex-col gap-3">
           {tasks.map((task) => (
             <TaskCard key={task.id} task={task} />
           ))}
+          <div
+            className={`
+            overflow-hidden transition-all duration-200 ease-in-out
+            ${showPlaceholder ? "h-25 opacity-100 mb-3" : "h-0 opacity-0 mb-0"}
+          `}
+          >
+            <div className="h-full w-full rounded-lg border-2 border-dashed border-white/10 bg-white/5" />
+          </div>
         </div>
       </div>
     </div>

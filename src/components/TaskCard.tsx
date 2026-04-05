@@ -15,7 +15,7 @@ export const TaskCard = ({ task }: TaskCardProps) => {
     });
 
   const style = {
-    transform: transform ? CSS.Translate.toString(transform) : undefined,
+    transform: isDragging ? undefined : CSS.Translate.toString(transform),
     opacity: isDragging ? 0.3 : 1,
   };
 
@@ -27,7 +27,7 @@ export const TaskCard = ({ task }: TaskCardProps) => {
       {...attributes}
       className="cursor-grab active:cursor-grabbing group flex flex-col gap-3 rounded-lg border border-white/5 bg-[#161616] p-3 shadow-sm transition-all hover:border-white/10 hover:bg-[#1c1c1c]"
     >
-      <TaskCardPure task={task} />
+      <TaskCardPure task={task} isDragging={isDragging} />
     </div>
   );
 };

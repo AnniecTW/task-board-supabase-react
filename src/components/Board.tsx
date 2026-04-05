@@ -94,10 +94,10 @@ export const Board = () => {
           ))}
         </div>
         {createPortal(
-          <DragOverlay>
+          <DragOverlay dropAnimation={null}>
             {activeTask ? (
-              <div className="scale-105 opacity-80 shadow-2xl">
-                <TaskCardPure task={activeTask} />
+              <div className="scale-105 opacity-80 shadow-2xl cursor-grabbing">
+                <TaskCardPure task={activeTask} isDragging={true} />
               </div>
             ) : null}
           </DragOverlay>,
