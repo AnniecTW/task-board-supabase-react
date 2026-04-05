@@ -1,6 +1,3 @@
-// Skeleton shown while the board is fetching data for the first time.
-// Mirrors the exact Column + TaskCard layout so there's no layout shift.
-
 const SKELETON_COLUMNS = [
   { title: "To Do", color: "bg-slate-500", cards: 3 },
   { title: "In Progress", color: "bg-blue-500", cards: 2 },

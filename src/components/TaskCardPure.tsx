@@ -2,7 +2,7 @@ import type { Task, TeamMember } from "../types/database";
 import { Calendar, Clock } from "lucide-react";
 import { useTeamMembers } from "../hooks/useTeamMembers";
 
-// ─── Due-date urgency ────────────────────────────────────────────────────────
+// Due-date urgency
 
 /** Returns true when the due date has passed OR is within the next 24 hours */
 function isUrgent(dueDate: string | null): boolean {
@@ -11,7 +11,7 @@ function isUrgent(dueDate: string | null): boolean {
   return msUntilDue <= 24 * 60 * 60 * 1000;
 }
 
-// ─── Assignee avatar ─────────────────────────────────────────────────────────
+// Assignee avatar
 
 function AssigneeAvatar({ member }: { member: TeamMember }) {
   if (member.avatar_url) {
@@ -41,7 +41,7 @@ function UnassignedAvatar() {
   );
 }
 
-// ─── Main component ──────────────────────────────────────────────────────────
+// Main component
 
 interface TaskCardPureProps {
   task: Task;
@@ -74,9 +74,8 @@ export const TaskCardPure = ({
   const DateIcon = urgent ? Clock : Calendar;
   const dateColor = urgent ? "text-red-400" : "text-slate-500";
 
-  // Assignee lookup (React Query cache — no extra network request)
   const assignee = task.assignee_id
-    ? members.find((m) => m.id === task.assignee_id) ?? null
+    ? (members.find((m) => m.id === task.assignee_id) ?? null)
     : null;
 
   return (
@@ -106,11 +105,7 @@ export const TaskCardPure = ({
         </div>
 
         {/* Assignee */}
-        {assignee ? (
-          <AssigneeAvatar member={assignee} />
-        ) : (
-          <UnassignedAvatar />
-        )}
+        {assignee ? <AssigneeAvatar member={assignee} /> : <UnassignedAvatar />}
       </div>
     </div>
   );

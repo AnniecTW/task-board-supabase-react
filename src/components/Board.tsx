@@ -30,7 +30,7 @@ const COLUMNS_CONF: ColumnData[] = [
   { id: "done", title: "Done", color: "bg-emerald-500" },
 ];
 
-// ─── Modal state ────────────────────────────────────────────────────────────
+// Modal state
 
 interface ModalState {
   isOpen: boolean;
@@ -46,7 +46,7 @@ const CLOSED_MODAL: ModalState = {
   defaultTitle: "",
 };
 
-// ─── Board ───────────────────────────────────────────────────────────────────
+// Board
 
 export const Board = () => {
   const { data: tasks = [], isLoading, error } = useTasks();
@@ -82,11 +82,21 @@ export const Board = () => {
 
   // Modal handlers
   const openEditModal = (task: Task) => {
-    setModal({ isOpen: true, task, defaultStatus: task.status, defaultTitle: "" });
+    setModal({
+      isOpen: true,
+      task,
+      defaultStatus: task.status,
+      defaultTitle: "",
+    });
   };
 
   const openCreateModal = (status: string, initialTitle = "") => {
-    setModal({ isOpen: true, task: null, defaultStatus: status, defaultTitle: initialTitle });
+    setModal({
+      isOpen: true,
+      task: null,
+      defaultStatus: status,
+      defaultTitle: initialTitle,
+    });
   };
 
   const closeModal = () => setModal(CLOSED_MODAL);
@@ -123,7 +133,9 @@ export const Board = () => {
               color={column.color}
               status={column.id}
               onTaskClick={openEditModal}
-              onNewTask={(initialTitle) => openCreateModal(column.id, initialTitle)}
+              onNewTask={(initialTitle) =>
+                openCreateModal(column.id, initialTitle)
+              }
             />
           ))}
         </div>

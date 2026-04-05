@@ -7,7 +7,7 @@ import { useTeamMembers } from "../hooks/useTeamMembers";
 import { useCreateTeamMember } from "../hooks/useCreateTeamMember";
 import { useDeleteTeamMember } from "../hooks/useDeleteTeamMember";
 
-// ─── Schema ──────────────────────────────────────────────────────────────────
+// Schema
 
 const memberSchema = z.object({
   name: z.string().min(1, "Name is required").max(50),
@@ -16,7 +16,7 @@ const memberSchema = z.object({
 
 type MemberFormValues = z.infer<typeof memberSchema>;
 
-// ─── Component ───────────────────────────────────────────────────────────────
+// Component
 
 interface ManageTeamModalProps {
   isOpen: boolean;
