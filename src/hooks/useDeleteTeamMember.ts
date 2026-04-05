@@ -16,6 +16,9 @@ export const useDeleteTeamMember = () => {
       );
       return { previousMembers };
     },
+    onSuccess: () => {
+      toast.success("Member removed");
+    },
     onError: (err, _vars, context) => {
       queryClient.setQueryData(["teamMembers"], context?.previousMembers);
       toast.error(err instanceof Error ? err.message : "Failed to remove member");

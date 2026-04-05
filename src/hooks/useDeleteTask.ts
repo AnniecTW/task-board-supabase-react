@@ -16,6 +16,9 @@ export const useDeleteTask = () => {
       );
       return { previousTasks };
     },
+    onSuccess: () => {
+      toast.success("Task deleted");
+    },
     onError: (err, _vars, context) => {
       queryClient.setQueryData(["tasks"], context?.previousTasks);
       toast.error(err instanceof Error ? err.message : "Failed to delete task");
