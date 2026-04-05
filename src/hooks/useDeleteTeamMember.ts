@@ -20,6 +20,7 @@ export const useDeleteTeamMember = () => {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["teamMembers"] });
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
     },
   });
 };

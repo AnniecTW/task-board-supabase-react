@@ -1,14 +1,15 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Kanban, Search, Users } from "lucide-react";
 import { useTasks } from "../hooks/useTasks";
 
 interface HeaderProps {
   onManageTeam: () => void;
+  searchQuery: string;
+  onSearch: (q: string) => void;
 }
 
-export const Header = ({ onManageTeam }: HeaderProps) => {
+export const Header = ({ onManageTeam, searchQuery, onSearch }: HeaderProps) => {
   const { data: tasks = [] } = useTasks();
-  const [search, setSearch] = useState("");
 
   const { totalTasks, inProgressCount, completedCount, overdueCount } =
     useMemo(() => {
@@ -65,8 +66,8 @@ export const Header = ({ onManageTeam }: HeaderProps) => {
           />
           <input
             type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            value={searchQuery}
+            onChange={(e) => onSearch(e.target.value)}
             placeholder="Search tasks…"
             className="h-8 w-52 rounded-md bg-white/5 pl-8 pr-3 text-sm text-slate-300 outline-none ring-1 ring-white/10 transition-all placeholder:text-slate-600 focus:bg-white/[0.07] focus:ring-white/20"
           />

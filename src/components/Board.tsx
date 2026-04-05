@@ -48,7 +48,11 @@ const CLOSED_MODAL: ModalState = {
 
 // Board
 
-export const Board = () => {
+interface BoardProps {
+  searchQuery?: string;
+}
+
+export const Board = ({ searchQuery = "" }: BoardProps) => {
   const { data: tasks = [], isLoading, error } = useTasks();
   const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
   const { mutate: updateTaskStatus } = useUpdateTaskStatus();
@@ -106,11 +110,15 @@ export const Board = () => {
     : null;
 
   const columnsWithTasks = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    const filtered = q
+      ? tasks.filter((t) => t.title.toLowerCase().includes(q))
+      : tasks;
     return COLUMNS_CONF.map((col) => ({
       ...col,
-      tasks: tasks.filter((t) => t.status === col.id),
+      tasks: filtered.filter((t) => t.status === col.id),
     }));
-  }, [tasks]);
+  }, [tasks, searchQuery]);
 
   if (isLoading) return <BoardSkeleton />;
   if (error)
