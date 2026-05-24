@@ -7,13 +7,17 @@ interface HeaderProps {
   searchQuery: string;
   onSearch: (q: string) => void;
 }
+const now = Date.now();
 
-export const Header = ({ onManageTeam, searchQuery, onSearch }: HeaderProps) => {
+export const Header = ({
+  onManageTeam,
+  searchQuery,
+  onSearch,
+}: HeaderProps) => {
   const { data: tasks = [] } = useTasks();
 
   const { totalTasks, inProgressCount, completedCount, overdueCount } =
     useMemo(() => {
-      const now = Date.now();
       return {
         totalTasks: tasks.length,
         inProgressCount: tasks.filter((t) => t.status === "in_progress").length,

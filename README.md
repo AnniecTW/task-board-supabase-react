@@ -2,6 +2,16 @@
 
 A Kanban board inspired by Linear, built with an emphasis on speed, clarity, and a smooth user experience. The goal was to move beyond a simple task list and create something that feels responsive and practical for everyday use.
 
+## Live Demo
+
+https://task-board-supabase-react.vercel.app
+
+## Preview
+
+![Board Overview](./screenshots/board-overview.png)
+
+![Task Modal](./screenshots/task-modal.png)
+
 ---
 
 ## Features

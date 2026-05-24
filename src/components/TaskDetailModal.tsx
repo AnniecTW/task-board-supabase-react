@@ -3,7 +3,15 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { X, AlignLeft, Tag, Calendar, Layers, UserCircle2, Trash2 } from "lucide-react";
+import {
+  X,
+  AlignLeft,
+  Tag,
+  Calendar,
+  Layers,
+  UserCircle2,
+  Trash2,
+} from "lucide-react";
 import type { Task } from "../types/database";
 import { useUpdateTask } from "../hooks/useUpdateTask";
 import { useCreateTask } from "../hooks/useCreateTask";
